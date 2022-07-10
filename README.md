@@ -25,22 +25,22 @@ npm link
 ## Usage
 
 ```sh
-yo salsa:cvu
-yo salsa:rcea
+yo apeiron:cvu
+yo apeiron:rcea
 ```
 
 ## Install in production
 
 1. Install Node.js LTS `https://nodejs.org/en/`
 2. Install Yeoman: `npm install -g yo`
-3. Install command SALSA: `npm install -g generator-salsa`
+3. Install command APEIRON: `npm install -g generator-apeiron`
 
 ## Collaborators
 
 👤 **Daniel Cortés Pichardo**
 
--   Website: https://danimaniarqsoft.github.io/
--   Github: [@danimaniarqsoft](https://github.com/danimaniarqsoft)
+- Website: https://danimaniarqsoft.github.io/
+- Github: [@danimaniarqsoft](https://github.com/danimaniarqsoft)
 
 ## 🤝 Contributing
 

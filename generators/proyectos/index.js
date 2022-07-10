@@ -11,25 +11,18 @@ var beautify = require('gulp-beautify');
 const fsreader = require('fs');
 var inquirer = require('inquirer');
 var dateFormat = require('dateformat');
-const Defaults = require('./defaults');
-const BecasService = require('./becasService');
-const Constants = require('./constants');
+const ProyectoService = require('./proyectosService');
 const axios = require('axios');
 const fs = require('fs');
 const csv = require('csv-parser');
 const Logger = require('../util/logger');
 const String = require('../util/strings');
 const Catalogos = require('../util/distribucion/constants');
-const { CATALOG } = require('./institucionesCatalog');
 const SalsaLogin = require('../util/SalsaLogin');
 
 module.exports = class extends Generator {
   constructor(args, opts) {
     super(args, opts);
-    this.option('programas');
-    this.option('permisos');
-    this.option('reglas');
-    this.option('proyectos');
     this.option('prod');
     this.option('qa');
   }
@@ -46,14 +39,30 @@ module.exports = class extends Generator {
       context.config = await SalsaLogin.login(context);
     }
 
-    if (this.options.programas) {
-      BecasService.loadProgramas(context);
-    } else if (this.options.reglas) {
-      BecasService.loadReglas(context);
-    } else if (this.options.proyectos) {
-      BecasService.loadProyectos(context);
-    } else if (this.options.permisos) {
-      BecasService.loadPermisos(context);
-    }
+    let model = await ProyectoService.readModelFromCsv('proyectos-layout.csv');
+
+    this.fs.copyTpl(this.templatePath('entity.model.ts.ejs'), this.destinationPath('demo/proyecto.model.ts'), {
+      entity: model,
+    });
+
+    this.fs.copyTpl(this.templatePath('entity.model.java.ejs'), this.destinationPath('demo/Proyecto.java'), {
+      entity: model,
+    });
+
+    this.fs.copyTpl(this.templatePath('entity.model.dto.java.ejs'), this.destinationPath('demo/ProyectoDTO.java'), {
+      entity: model,
+    });
+
+    this.fs.copyTpl(this.templatePath('project.vue.ejs'), this.destinationPath('demo/project-edit.vue'), {
+      entity: model,
+    });
+
+    this.fs.copyTpl(this.templatePath('util.ts.ejs'), this.destinationPath('demo/util.ts'), {
+      entity: model,
+    });
+
+    this.fs.copyTpl(this.templatePath('proyecto.mapper.ts.ejs'), this.destinationPath('demo/proyecto.mapper.ts'), {
+      entity: model,
+    });
   }
 };

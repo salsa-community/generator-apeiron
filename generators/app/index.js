@@ -11,7 +11,7 @@ module.exports = class extends SalsaBaseGenerator {
       {
         type: 'list',
         name: 'appType',
-        message: 'Welcome to SALSA CLI?',
+        message: 'Welcome to APEIRON CLI?',
         choices: [
           {
             value: 'cvu',
