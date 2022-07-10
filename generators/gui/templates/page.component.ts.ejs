@@ -1,0 +1,116 @@
+import { Component, Vue, Inject } from 'vue-property-decorator';
+
+import CatalogoService from '@/shared/catalogo/catalogo.service';
+import AlertService from '@/shared/alert/alert.service';
+
+import { <%= page.name.pascalCase%>, <%= page.name.pascalCase%>Api } from '@/shared/perfil-usuario/api';
+import { required, minLength, maxLength, helpers } from 'vuelidate/lib/validators';
+
+    <%_ for (const idx in page.properties) { _%>
+      <%_ let campo = page.properties[idx]; _%>
+      <%_ if (campo.validations.regex) { _%>
+const <%= campo.name.constantCase%> = helpers.regex(
+  '<%=campo.name.camelCase%>',
+  <%=campo.validations.regex%>
+);
+        <%_ } _%>
+    <%_ }; _%>
+
+const validations: any = {
+
+  <%= page.name.camelCase%>: {
+  <%_ for (const idx in page.properties) { _%>
+    <%_ let campo = page.properties[idx]; _%>
+    <%= campo.name.camelCase%>: {
+      <%_ if (campo.validations.required) { _%>
+      required,
+      <%_ }_%>
+      <%_ if (campo.validations.min) { _%>
+      minLength: minLength(<%= campo.validations.min%>),
+      <%_ } _%>
+      <%_ if (campo.validations.max) { _%>
+      maxLength: maxLength(<%= campo.validations.max%>),
+      <%_ } _%>
+      <%_ if (campo.validations.regex) { _%>
+      <%= campo.name.constantCase%>,
+      <%_ } _%>
+    },
+  <%_ }; _%>
+  },
+};
+
+@Component({
+  validations,
+})
+export default class <%= page.name.pascalCase%>Component extends Vue {
+  @Inject('alertService') private alertService: () => AlertService;
+  @Inject('<%= page.name.camelCase%>Api') private <%= page.name.camelCase%>Api: () => <%= page.name.pascalCase%>Api;
+  @Inject('catalogoService') private catalogoService: () => CatalogoService;
+
+  public <%= page.name.camelCase%>: <%= page.name.pascalCase%> = {};
+  public isSaving = false;
+  public currentLanguage = '';
+
+        <%_ for (const idx in page.properties) { _%>
+          <%_ let campo = page.properties[idx]; _%>
+          <%_ if (campo.uiType === 'Date') { _%>
+            <%_ if (campo.validations.min) { _%>
+  public minDate<%= campo.name.pascalCase%> = new Date('<%=campo.validations.min%>');
+            <%_ } _%>
+            <%_ if (campo.validations.max) { _%>
+  public maxDate<%= campo.name.pascalCase%> = new Date('<%=campo.validations.max%>');
+            <%_ } _%>
+          <%_ } _%>
+          <%_ if (campo.uiType === 'inputImage') { _%>
+            <%_ if (campo.validations) { _%>
+  public estadoInvalido<%= campo.name.pascalCase%> = false;
+            <%_ } _%>
+          <%_ } _%>
+          <%_ if (campo.uiType === 'selectMany' || campo.uiType === 'selectMultiple') { _%>
+  public selected<%= campo.name.pascalCase%> = [];
+          <%_ } _%>
+          <%_ if (campo.uiType === 'selectOne') { _%>
+  public <%= campo.name.camelCase%>Options = [
+    { value: null, text: 'Seleccione <%= campo.label%>', disabled: true },
+    { value: '<%= campo.name.camelCase%>1', text: '<%= campo.title%> 1' },
+    { value: '<%= campo.name.camelCase%>2', text: '<%= campo.title%> 2' },
+    { value: '<%= campo.name.camelCase%>3', text: '<%= campo.title%> 3' },
+    { value: '<%= campo.name.camelCase%>4', text: '<%= campo.title%> 4' },
+    { value: '<%= campo.name.camelCase%>5', text: '<%= campo.title%> 5' },
+  ];
+          <%_ } _%>
+          <%_ if (campo.uiType === 'selectMany' || campo.uiType === 'selectMultiple' || campo.uiType === 'selectRadio') { _%>
+  public <%= campo.name.camelCase%>Options = [
+    { value: '<%= campo.name.camelCase%>1', text: '<%= campo.title%> 1' },
+    { value: '<%= campo.name.camelCase%>2', text: '<%= campo.title%> 2' },
+    { value: '<%= campo.name.camelCase%>3', text: '<%= campo.title%> 3' },
+    { value: '<%= campo.name.camelCase%>4', text: '<%= campo.title%> 4' },
+    { value: '<%= campo.name.camelCase%>5', text: '<%= campo.title%> 5' },
+  ];
+          <%_ } _%>
+        <%_ }; _%>
+
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      if (to.params.campoId) {
+        vm.retrieveCampo(to.params.campoId);
+      }
+    });
+  }
+
+  created(): void {
+    this.currentLanguage = this.$store.getters.currentLanguage;
+    this.$store.watch(
+      () => this.$store.getters.currentLanguage,
+      () => {
+        this.currentLanguage = this.$store.getters.currentLanguage;
+      }
+    );
+  }
+
+  public previousState(): void {
+    this.$router.go(-1);
+  }
+
+  public initRelationships(): void {}
+}
