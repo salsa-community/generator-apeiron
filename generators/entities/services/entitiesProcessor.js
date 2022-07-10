@@ -1,6 +1,6 @@
 'use strict';
 
-const String = require('../../util/strings');
+const String = require('../util/strings');
 
 const fsreader = require('fs');
 const SECCION_PROP = 'seccion';
@@ -15,13 +15,15 @@ const $ = cheerio.load('<h2 class="title">Hello world</h2>');
 var beautify = require('gulp-beautify');
 var inquirer = require('inquirer');
 var dateFormat = require('dateformat');
-const BecasService = require('./modelHelper');
+const BecasService = require('./entitiesProcessor');
 const axios = require('axios');
 const fs = require('fs');
 const csv = require('csv-parser');
-const Logger = require('../../util/logger');
-const Catalogos = require('../../util/distribucion/constants');
+const Logger = require('../util/logger');
+const Catalogos = require('../util/distribucion/constants');
 
+const CAMPOS = require('../../campos.json');
+const DISCIPLINAS = require('../../disciplinas.json');
 const Inflector = require('../inflector');
 
 const moment = require('moment');
@@ -96,20 +98,13 @@ module.exports = class guiService {
     } while (currentDate - date < milliseconds);
   }
 
-  static addRelationship(model, leftEntity, rightEntity, type, name) {
-    let relationship = { to: model.entities[rightEntity], type: type, name: name };
-    model.entities[leftEntity].relationships.push(relationship);
-  }
   static readModelFromCsv(filePath) {
-    let model = { entities: {} }; //this.createEntity();
+    let model = this.createDefaultModel();
     return new Promise(resolve => {
       fs.createReadStream(filePath)
-        .pipe(csv({ mapHeaders: ({ header }) => String.normalize(String.toCamelCase(header)) }))
+        .pipe(csv({ mapHeaders: ({ header }) => String.toCamelCase(header) }))
         .on('data', row => {
-          if (!model.entities[row.objeto]) {
-            model.entities[row.objeto] = this.createEntity(row.objeto);
-          }
-          model.entities[row.objeto].properties.push(this.createProperty(row));
+          model.properties.push(this.createProperty(row));
         })
         .on('end', function () {
           resolve(model);
@@ -117,18 +112,17 @@ module.exports = class guiService {
     });
   }
 
-  static createEntity(entityName) {
+  static createDefaultModel() {
     return {
-      title: String.toPascalCase(entityName),
+      title: 'Proyecto',
       name: {
-        plural: Inflector.pluralize(entityName),
-        camelCase: String.toCamelCase(entityName),
-        dashCase: String.toDashCase(entityName),
-        pascalCase: String.toPascalCase(entityName),
+        plural: 'proyectos',
+        camelCase: 'proyecto',
+        dashCase: 'proyecto',
+        pascalCase: 'Proyecto',
       },
       path: '',
       properties: [],
-      relationships: [],
       type: 'object',
     };
   }
@@ -145,12 +139,7 @@ module.exports = class guiService {
     property.description = row.descripcion;
     property.title = row.nombreDeVariable;
     property.etapa = row.etapa;
-    property.estatus = row.estatus;
-    property.orden = row.orden;
-    property.validations = {};
-    property.validations.max = row.max;
-    property.validations.catalogo = row.catalogo;
-    property.validations.regexp = row.regExp;
+    property.estatus = row.estatusPropuesto;
     return property;
   }
 
@@ -158,8 +147,7 @@ module.exports = class guiService {
     if (type == 'Date') {
       return 'Date';
     }
-    // TODO review if Double and Integer are the dame for number in front end
-    if (type == 'Double' || type == 'Integer') {
+    if (type == 'Double') {
       return 'number';
     }
 

@@ -1,24 +1,7 @@
 var Generator = require('yeoman-generator');
 
-const ora = require('ora');
-const chalk = require('chalk');
-const prompts = require('prompts');
-const terminalLink = require('terminal-link');
-const { info, warn } = require('prettycli');
-const cheerio = require('cheerio');
-const $ = cheerio.load('<h2 class="title">Hello world</h2>');
-var beautify = require('gulp-beautify');
-const fsreader = require('fs');
-var inquirer = require('inquirer');
-var dateFormat = require('dateformat');
 const ModelHelper = require('./modelHelper');
-const axios = require('axios');
-const fs = require('fs');
-const csv = require('csv-parser');
-const Logger = require('../util/logger');
-const String = require('../util/strings');
-const Catalogos = require('../util/distribucion/constants');
-const SalsaLogin = require('../util/SalsaLogin');
+const { ONE_TO_MANY } = require('../../util/relationships-types');
 
 module.exports = class extends Generator {
   constructor(args, opts) {
@@ -28,11 +11,17 @@ module.exports = class extends Generator {
   }
 
   async writing() {
-    let model = await ModelHelper.readModelFromCsv('proyectos-layout-v2.csv');
-    console.log(JSON.stringify(model, null, 2));
+    let model = await ModelHelper.readModelFromCsv('proyectos-layout.csv');
+    ModelHelper.addRelationship(model, 'proyecto', 'ministracion', ONE_TO_MANY, 'ministraciones');
+    ModelHelper.addRelationship(model, 'proyecto', 'comentario_panel', ONE_TO_MANY, 'comentarios');
+    ModelHelper.addRelationship(model, 'proyecto', 'aprobacion', ONE_TO_MANY, 'aprobaciones');
 
     this.fs.copyTpl(this.templatePath('entity.model.ts.ejs'), this.destinationPath('demo/proyecto.model.ts'), {
-      entity: model.proyecto,
+      entity: model.entities.proyecto,
+    });
+
+    this.fs.copyTpl(this.templatePath('model.json.ejs'), this.destinationPath('demo/model.json'), {
+      model: JSON.stringify(model, null, 2),
     });
 
     // this.fs.copyTpl(this.templatePath('entity.model.java.ejs'), this.destinationPath('demo/Proyecto.java'), {
