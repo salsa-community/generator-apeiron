@@ -7,7 +7,10 @@ import java.util.Objects;
 
 import lombok.Getter;
 import lombok.Setter;
-import mx.conacyt.crip.ms.proyectos.domain.Mensaje;
+
+<% for( relationship of entity.relationships.filter(relationship => relationship.type == 'oneToMany' || relationship.type == 'oneToOne')) { -%>
+import mx.conacyt.crip.ms.proyectos.domain.<%= relationship.to.name.pascalCase%>;
+<% } -%>
 
 /**
  * A <%=entity.name.pascalCase%>.
@@ -18,21 +21,15 @@ public class <%=entity.name.pascalCase%>DTO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
+<% if (!entity.isEmbedded) { -%>
   private String id;
-
-  <%_ entity.properties.forEach(property => { _%>
-    <%_ if (property.multiplicidad === 'one') { _%>
-    private <%= property.backEndType%> <%= property.camelCase%>;
-    <%_ } else { _%>
-    private List<<%= property.backEndType%>> <%= property.camelCase%>;
-    <%_ } _%>
-  
-    <%_ }); _%>
-    private String estatus;
-
-    private String etapa;
-
-    private List<Mensaje> mensajes;
+<% } -%>
+<%_ entity.properties.forEach(property => { _%>
+  private <%= property.backEndType%> <%= property.camelCase %>;
+<%_ }); -%>
+<% for( relationship of entity.relationships.filter(relationship => relationship.type == 'oneToMany' || relationship.type == 'oneToOne')) { -%>
+  private List<<%= relationship.to.name.pascalCase%>> <%= relationship.name.pascalCase%>;
+<% } -%>
 
   // jhipster-needle-entity-add-field - JHipster will add fields hereetters and setters here
 
@@ -44,12 +41,20 @@ public class <%=entity.name.pascalCase%>DTO implements Serializable {
       if (!(o instanceof <%=entity.name.pascalCase%>DTO)) {
           return false;
       }
+<%_ if (entity.isEmbedded) { _%>
+      return false;
+<%_ } else { _%>
       return id != null && id.equals(((<%=entity.name.pascalCase%>DTO) o).id);
+<%_ } _%>
   }
 
   @Override
   public int hashCode() {
+<%_ if (entity.isEmbedded) { _%>
+    return getClass().hashCode();
+  <%_ } else { _%>
     return Objects.hash(this.id);
+<%_ } _%>
   }
 
   // prettier-ignore

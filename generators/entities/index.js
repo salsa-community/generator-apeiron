@@ -2,6 +2,7 @@ var Generator = require('yeoman-generator');
 
 const ModelHelper = require('./modelHelper');
 const { ONE_TO_MANY } = require('../../util/relationships-types');
+const GeneratorProcessor = require('./processors/generatorProcessor');
 
 module.exports = class extends Generator {
   constructor(args, opts) {
@@ -15,21 +16,9 @@ module.exports = class extends Generator {
     ModelHelper.addRelationship(model, 'proyecto', 'ministracion', ONE_TO_MANY, 'ministraciones');
     ModelHelper.addRelationship(model, 'proyecto', 'comentario_panel', ONE_TO_MANY, 'comentarios');
     ModelHelper.addRelationship(model, 'proyecto', 'aprobacion', ONE_TO_MANY, 'aprobaciones');
+    ModelHelper.markAsEmbedded(model, 'ministracion', true);
+    ModelHelper.markAsEmbedded(model, 'aprobacion', true);
 
-    this.fs.copyTpl(this.templatePath('entity.model.ts.ejs'), this.destinationPath('demo/proyecto.model.ts'), {
-      entity: model.entities.proyecto,
-    });
-
-    this.fs.copyTpl(this.templatePath('model.json.ejs'), this.destinationPath('demo/model.json'), {
-      model: JSON.stringify(model, null, 2),
-    });
-
-    // this.fs.copyTpl(this.templatePath('entity.model.java.ejs'), this.destinationPath('demo/Proyecto.java'), {
-    //   entity: model,
-    // });
-
-    // this.fs.copyTpl(this.templatePath('entity.model.dto.java.ejs'), this.destinationPath('demo/ProyectoDTO.java'), {
-    //   entity: model,
-    // });
+    GeneratorProcessor.doProcess(model, this, true);
   }
 };

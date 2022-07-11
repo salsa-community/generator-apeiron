@@ -97,9 +97,14 @@ module.exports = class guiService {
   }
 
   static addRelationship(model, leftEntity, rightEntity, type, name) {
-    let relationship = { to: model.entities[rightEntity], type: type, name: name };
+    let relationship = { to: model.entities[rightEntity], type: type, name: this.resolveCommonNames(name) };
     model.entities[leftEntity].relationships.push(relationship);
   }
+
+  static markAsEmbedded(model, entityName) {
+    model.entities[entityName].isEmbedded = true;
+  }
+
   static readModelFromCsv(filePath) {
     let model = { entities: {} }; //this.createEntity();
     return new Promise(resolve => {
@@ -120,25 +125,17 @@ module.exports = class guiService {
   static createEntity(entityName) {
     return {
       title: String.toPascalCase(entityName),
-      name: {
-        plural: Inflector.pluralize(entityName),
-        camelCase: String.toCamelCase(entityName),
-        dashCase: String.toDashCase(entityName),
-        pascalCase: String.toPascalCase(entityName),
-      },
+      name: this.resolveCommonNames(entityName),
       path: '',
       properties: [],
       relationships: [],
       type: 'object',
+      isEmbedded: false,
     };
   }
 
   static createProperty(row) {
-    let property = {};
-    property.camelCase = String.toCamelCase(row.nombreCamposPantalla);
-    property.dashCase = String.toDashCase(row.nombreCamposPantalla);
-    property.pascalCase = String.toPascalCase(row.nombreCamposPantalla);
-    property.snakeCase = String.toSnakeCase(row.nombreCamposPantalla);
+    let property = this.resolveCommonNames(row.nombreCamposPantalla);
     property.multiplicidad = this.resolveMultiplicidad(row.multiplicidad);
     property.frontEndType = this.resolveFrontEndType(row.tipo);
     property.backEndType = this.resolveBackEndType(row.tipo);
@@ -152,6 +149,16 @@ module.exports = class guiService {
     property.validations.catalogo = row.catalogo;
     property.validations.regexp = row.regExp;
     return property;
+  }
+
+  static resolveCommonNames(name) {
+    return {
+      plural: Inflector.pluralize(name),
+      camelCase: String.toCamelCase(name),
+      dashCase: String.toDashCase(name),
+      pascalCase: String.toPascalCase(name),
+      snakeCase: String.toSnakeCase(name),
+    };
   }
 
   static resolveFrontEndType(type) {
