@@ -1,4 +1,4 @@
-package mx.conacyt.crip.ms.proyectos.service.dto;
+package <%=entity.package%>.service.dto;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 <% for( relationship of entity.relationships.filter(relationship => relationship.type == 'oneToMany' || relationship.type == 'oneToOne')) { -%>
-import mx.conacyt.crip.ms.proyectos.domain.<%= relationship.to.name.pascalCase%>;
+import mx.conacyt.crip.ms.proyectos.service.dto.<%= relationship.to.name.pascalCase%>DTO;
 <% } -%>
 
 /**
@@ -28,7 +28,7 @@ public class <%=entity.name.pascalCase%>DTO implements Serializable {
   private <%= property.backEndType%> <%= property.camelCase %>;
 <%_ }); -%>
 <% for( relationship of entity.relationships.filter(relationship => relationship.type == 'oneToMany' || relationship.type == 'oneToOne')) { -%>
-  private List<<%= relationship.to.name.pascalCase%>> <%= relationship.name.pascalCase%>;
+  private List<<%= relationship.to.name.pascalCase%>DTO> <%= relationship.name.camelCase%>;
 <% } -%>
 
   // jhipster-needle-entity-add-field - JHipster will add fields hereetters and setters here
@@ -61,10 +61,12 @@ public class <%=entity.name.pascalCase%>DTO implements Serializable {
   @Override
   public String toString() {
       return "<%=entity.name.pascalCase%>{" +
-          "id=" + getId() +
-          <%_ entity.properties.forEach(property => { _%>
-            ", <%= property.camelCase%>='" + get<%= property.pascalCase%>() + "'" +
-            <%_ }); _%>
-          "}";
+<% if (!entity.isEmbedded) { -%>
+        "id=" + getId() +
+<% } -%>
+      <%_ entity.properties.forEach(property => { _%>
+        ", <%= property.camelCase%>='" + get<%= property.pascalCase%>() + "'" +
+        <%_ }); _%>
+      "}";
   }
 }

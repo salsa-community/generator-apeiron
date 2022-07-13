@@ -1,33 +1,15 @@
 'use strict';
 
 const String = require('../../util/strings');
-
-const fsreader = require('fs');
-const SECCION_PROP = 'seccion';
-var Generator = require('yeoman-generator');
-const ora = require('ora');
-const chalk = require('chalk');
-const prompts = require('prompts');
-const terminalLink = require('terminal-link');
-const { info, warn } = require('prettycli');
-const cheerio = require('cheerio');
-const $ = cheerio.load('<h2 class="title">Hello world</h2>');
-var beautify = require('gulp-beautify');
-var inquirer = require('inquirer');
-var dateFormat = require('dateformat');
-const BecasService = require('./modelHelper');
+const { warn } = require('prettycli');
 const axios = require('axios');
 const fs = require('fs');
 const csv = require('csv-parser');
-const Logger = require('../../util/logger');
-const Catalogos = require('../../util/distribucion/constants');
 
 const Inflector = require('../inflector');
 
 const moment = require('moment');
-module.exports = class guiService {
-  static log = Logger.getLogger('rules-warning');
-
+module.exports = class modelHelper {
   static toProyecto(p, spinner) {
     let proyecto = {};
     proyecto.id = String.normalizeId(p.convocatoria) + '-' + p.clave;
@@ -58,7 +40,7 @@ module.exports = class guiService {
 
   static split(id, string, spinner, validate, modulo) {
     if (string) {
-      const elements = string; //string.toString().split(',');
+      const elements = string;
       for (let index = 0; index < elements.length; index++) {
         elements[index] = String.normalize(elements[index]);
         if (!validate.includes(elements[index])) {
@@ -105,8 +87,26 @@ module.exports = class guiService {
     model.entities[entityName].isEmbedded = true;
   }
 
-  static readModelFromCsv(filePath) {
-    let model = { entities: {} }; //this.createEntity();
+  static resolveDefaultOutputPaths(model, packageName, generator) {
+    let packageNameWithSlash = packageName.replace(/\./g, '/');
+    model.out = {};
+    model.out.vueEntities = 'src/main/webapp/app/entities/proyectosMs';
+    model.out.entityModelTs = 'src/main/webapp/app/shared/model/proyectosMs';
+    model.out.dtos = 'src/main/webapp/app/shared/model/msPerfil';
+    model.out.modelJava = `src/main/java/${packageNameWithSlash}/domain`;
+    model.out.modelDtoJava = `src/main/java/${packageNameWithSlash}/service/dto`;
+    model.out.apiPath = 'api.yml';
+    this.addPackage(model, packageName);
+  }
+
+  static addPackage(model, packageName) {
+    for (let entityKey in model.entities) {
+      model.entities[entityKey].package = packageName;
+    }
+  }
+
+  static readModelFromCsv(filePath, generator) {
+    let model = { entities: {} };
     return new Promise(resolve => {
       fs.createReadStream(filePath)
         .pipe(csv({ mapHeaders: ({ header }) => String.normalize(String.toCamelCase(header)) }))
@@ -162,11 +162,11 @@ module.exports = class guiService {
   }
 
   static resolveFrontEndType(type) {
-    if (type == 'Date') {
+    if (type.toUpperCase() == 'DATE') {
       return 'Date';
     }
     // TODO review if Double and Integer are the dame for number in front end
-    if (type == 'Double' || type == 'Integer') {
+    if (type.toUpperCase() == 'DOUBLE' || type.toUpperCase() == 'INTEGER') {
       return 'number';
     }
 
@@ -174,8 +174,14 @@ module.exports = class guiService {
   }
 
   static resolveBackEndType(type) {
-    if (type == 'Date') {
+    if (type.toUpperCase() == 'DATE') {
       return 'Instant';
+    } else if (type.toUpperCase() == 'STRING') {
+      return 'String';
+    } else if (type.toUpperCase() == 'INTEGER') {
+      return 'Integer';
+    } else if (type.toUpperCase() == 'BOOLEAN') {
+      return 'Boolean';
     }
     return type;
   }

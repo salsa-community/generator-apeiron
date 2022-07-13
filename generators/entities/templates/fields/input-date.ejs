@@ -1,0 +1,11 @@
+          <b-form-group id="form-group-<%= property.dashCase%>-id" label="<%= property.title%>" label-for="input-<%= property.dashCase%>-id">
+            <div class="d-flex">
+              <b-form-datepicker
+                value-as-date
+                id="input-<%= property.dashCase%>-id"
+                placeholder="<%= property.description%>"
+                :state="<%= entity.name.camelCase%>.<%= property.camelCase%> != null"
+                v-model="<%= entity.name.camelCase%>.<%= property.camelCase%>" locale="es">
+              </b-form-datepicker>
+            </div>
+          </b-form-group>

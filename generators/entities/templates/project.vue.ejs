@@ -1,13 +1,31 @@
 <template>
   <b-tabs content-class="mt-3" fill>
-    <b-tab title="Selección de propuestas" active>
+    <b-tab title="Dato de identificacion" active>
       <b-tabs content-class="mt-3" fill>
-        <b-tab title="Convocatoria" active>
+        <b-tab title="Dato de identificación" active>
+        <%_ entity.properties.forEach(property => { _%>
+          <%_ if (property.estatus === 'Dato de identificación') { _%>
+<%- include('page-fields', {entity: entity, property: property}); %>
+          <%_ } _%>
+        <%_ }); _%>
+        </b-tab>
+      </b-tabs>
+    </b-tab>
+    <b-tab title="Selección de propuestas">
+      <b-tabs content-class="mt-3" fill>
+        <b-tab title="Convocatoria">
         <%_ entity.properties.forEach(property => { _%>
           <%_ if (property.estatus === 'Convocatoria') { _%>
 <%- include('page-fields', {entity: entity, property: property}); %>
           <%_ } _%>
         <%_ }); _%>
+        </b-tab>
+        <b-tab title="Recepción">
+          <%_ entity.properties.forEach(property => { _%>
+            <%_ if (property.estatus === 'Recepción') { _%>
+<%- include('page-fields', {entity: entity, property: property}); %>
+            <%_ } _%>
+          <%_ }); _%>
         </b-tab>
         <b-tab title="Revisión" >
           <%_ entity.properties.forEach(property => { _%>
@@ -41,7 +59,73 @@
     </b-tab>
     <b-tab title="Seguimiento técnico y administrativo">
       <b-tabs content-class="mt-3" fill>
-        <b-tab title="Ministración" active>
+        <b-tab title="Ministración">
+          <ministraciones v-on:addMinistracion="addMinistracion"></ministraciones>
+          <b-table emptyText="No tienes ministraciones registradas" striped hover :items="proyecto.ministraciones" show-empty>
+            <template #head(estadoCuenta)="">
+              <div>Estado de cuenta</div>
+            </template>
+            <template #head(fechaEnvioPartidaPresp)="">
+              <div>Fecha de envio de partida presupuestal</div>
+            </template>
+            <template #head(numCfdi)="">
+              <div>Número de CFDI</div>
+            </template>
+            <template #head(fechaEmisionFactura)="">
+              <div>Fecha de emisión de factura</div>
+            </template>
+            <template #head(fechaEnvioOficios)="">
+              <div>Fecha de envio de oficios</div>
+            </template>
+            <template #head(fechaMinistracion)="">
+              <div>Fecha de ministración</div>
+            </template>
+            <template #head(montoMinistrado)="">
+              <div>Monto ministrado</div>
+            </template>
+            <template #head(fechaNotificacion)="">
+              <div>Fecha de notificación</div>
+            </template>
+            <template #cell(fechaEnvioPartidaPresp)="row">
+              <p class="m-1 text-center rounded" badge="BV">
+                <small>{{ row.item.fechaEnvioPartidaPresp }}</small>
+              </p>
+            </template>
+            <template #cell(numCfdi)="row">
+              <p class="m-1 text-center rounded" badge="BV">
+                <small>{{ row.item.numCfdi }}</small>
+              </p>
+            </template>
+
+            <template #cell(fechaEmisionFactura)="row">
+              <p class="m-1 text-center rounded" badge="BV">
+                <small>{{ row.item.fechaEmisionFactura }}</small>
+              </p>
+            </template>
+            <template #cell(fechaEnvioOficios)="row">
+              <p class="m-1 text-center rounded" badge="BV">
+                <small>{{ row.item.fechaEnvioOficios }}</small>
+              </p>
+            </template>
+
+            <template #cell(fechaMinistracion)="row">
+              <p class="m-1 text-center rounded" badge="BV">
+                <small>{{ row.item.fechaMinistracion }}</small>
+              </p>
+            </template>
+
+            <template #cell(montoMinistrado)="row">
+              <p class="m-1 text-center rounded" badge="BV">
+                <small>{{ row.item.montoMinistrado }}</small>
+              </p>
+            </template>
+
+            <template #cell(fechaNotificacion)="row">
+              <p class="m-1 text-center rounded" badge="BV">
+                <small>{{ row.item.fechaNotificacion }}</small>
+              </p>
+            </template>
+          </b-table>
           <%_ entity.properties.forEach(property => { _%>
             <%_ if (property.estatus === 'Ministración') { _%>
 <%- include('page-fields', {entity: entity, property: property}); %>
@@ -66,7 +150,7 @@
     </b-tab>
     <b-tab title="Conclusión">
       <b-tabs content-class="mt-3" fill>
-        <b-tab title="Concluido" active>
+        <b-tab title="Concluido">
           <%_ entity.properties.forEach(property => { _%>
             <%_ if (property.estatus === 'Concluido') { _%>
 <%- include('page-fields', {entity: entity, property: property}); %>

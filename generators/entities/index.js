@@ -13,12 +13,13 @@ module.exports = class extends Generator {
 
   async writing() {
     let model = await ModelHelper.readModelFromCsv('proyectos-layout.csv');
+    ModelHelper.resolveDefaultOutputPaths(model, 'mx.conacyt.crip.ms.proyectos', this);
     ModelHelper.addRelationship(model, 'proyecto', 'ministracion', ONE_TO_MANY, 'ministraciones');
     ModelHelper.addRelationship(model, 'proyecto', 'comentario_panel', ONE_TO_MANY, 'comentarios');
     ModelHelper.addRelationship(model, 'proyecto', 'aprobacion', ONE_TO_MANY, 'aprobaciones');
     ModelHelper.markAsEmbedded(model, 'ministracion', true);
     ModelHelper.markAsEmbedded(model, 'aprobacion', true);
-
+    ModelHelper.markAsEmbedded(model, 'comentario_panel', true);
     GeneratorProcessor.doProcess(model, this, true);
   }
 };

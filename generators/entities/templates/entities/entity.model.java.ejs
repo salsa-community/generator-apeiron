@@ -1,0 +1,94 @@
+package <%=entity.package%>.domain;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.List;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+import lombok.Getter;
+import lombok.Setter;
+
+<% for( relationship of entity.relationships.filter(relationship => relationship.type == 'oneToMany' || relationship.type == 'oneToOne')) { -%>
+  import <%=entity.package%>.domain.<%= relationship.to.name.pascalCase%>;
+<% } -%>
+
+/**
+ * A <%=entity.name.pascalCase%>.
+ */
+@Getter
+@Setter
+<% if (!entity.isEmbedded) { -%>
+@Document(collection = "<%=entity.name.plural%>")
+<% } -%>
+public class <%=entity.name.pascalCase%> implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
+<% if (!entity.isEmbedded) { -%>
+  @Id
+  private String id;
+<% } -%>
+<%_ entity.properties.forEach(property => { _%>
+  @Field("<%= property.snakeCase%>")
+  private <%= property.backEndType%> <%= property.camelCase%>;
+
+<%_ }); %>
+<% for( relationship of entity.relationships.filter(relationship => relationship.type == 'oneToMany' || relationship.type == 'oneToOne')) { -%>
+  private List<<%= relationship.to.name.pascalCase%>> <%= relationship.name.camelCase%>;
+<% } -%>
+
+  // jhipster-needle-entity-add-field - JHipster will add fields here
+
+<%_ entity.properties.forEach(property => { _%>
+  public <%= entity.name.pascalCase%> <%= property.camelCase%>(<%= property.backEndType%> <%= property.camelCase%>) {
+    this.set<%= property.pascalCase%>(<%= property.camelCase%>);
+    return this;
+  }
+<%_ }); _%>
+
+<% for( relationship of entity.relationships.filter(relationship => relationship.type == 'oneToMany' || relationship.type == 'oneToOne')) { -%>
+  public <%= entity.name.pascalCase%> <%= relationship.name.camelCase%>(List<<%= relationship.to.name.pascalCase%>> <%= relationship.name.camelCase%>) {
+    this.set<%= relationship.name.pascalCase%>(<%= relationship.name.camelCase%>);
+    return this;
+  }
+<% } -%>
+
+  // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+
+  @Override
+  public boolean equals(Object o) {
+      if (this == o) {
+          return true;
+      }
+      if (!(o instanceof <%=entity.name.pascalCase%>)) {
+          return false;
+      }
+<%_ if (entity.isEmbedded) { _%>
+      return false;
+<%_ } else { _%>
+      return id != null && id.equals(((<%=entity.name.pascalCase%>) o).id);
+<%_ } _%>
+  }
+
+  @Override
+  public int hashCode() {
+      // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+      return getClass().hashCode();
+  }
+
+  // prettier-ignore
+  @Override
+  public String toString() {
+      return "<%=entity.name.pascalCase%>{" +
+<% if (!entity.isEmbedded) { -%>
+        "id=" + getId() +
+<% } -%>
+        <%_ entity.properties.forEach(property => { _%>
+        ", <%= property.camelCase%>='" + get<%= property.pascalCase%>() + "'" +
+          <%_ }); _%>
+      "}";
+  }
+}
