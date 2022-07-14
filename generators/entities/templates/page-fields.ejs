@@ -2,6 +2,8 @@
 <%- include('fields/input-date', {entity: entity, property: property}); %>
 <%_ } else if (property.frontEndType === 'number') { _%>
 <%- include('fields/input-number', {entity: entity, property: property}); %>
+<%_ } else if (property.catalog != null && property.catalog != '') { _%>
+<%- include('fields/select-one', {entity: entity, property: property}); %>
 <%_ } else if (property.frontEndType === 'string') { _%>
 <%- include('fields/input-text', {entity: entity, property: property}); %>
 <%_ } _%>

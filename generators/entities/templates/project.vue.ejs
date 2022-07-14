@@ -27,21 +27,21 @@
             <%_ } _%>
           <%_ }); _%>
         </b-tab>
-        <b-tab title="Revisión" >
+        <b-tab title="Revisión">
           <%_ entity.properties.forEach(property => { _%>
             <%_ if (property.estatus === 'Revisión') { _%>
 <%- include('page-fields', {entity: entity, property: property}); %>
             <%_ } _%>
           <%_ }); _%>
         </b-tab>
-        <b-tab title="Aprobación" >
+        <b-tab title="Aprobación">
           <%_ entity.properties.forEach(property => { _%>
             <%_ if (property.estatus === 'Aprobación') { _%>
 <%- include('page-fields', {entity: entity, property: property}); %>
             <%_ } _%>
           <%_ }); _%>
         </b-tab>
-        <b-tab title="Cancelación" >
+        <b-tab title="Cancelación">
           <%_ entity.properties.forEach(property => { _%>
             <%_ if (property.estatus === 'Cancelación') { _%>
 <%- include('page-fields', {entity: entity, property: property}); %>
@@ -88,7 +88,7 @@
             </template>
             <template #cell(fechaEnvioPartidaPresp)="row">
               <p class="m-1 text-center rounded" badge="BV">
-                <small>{{ row.item.fechaEnvioPartidaPresp }}</small>
+                <small>{{ row.item.fechaEnvioPartidaPresp | formatDate}}</small>
               </p>
             </template>
             <template #cell(numCfdi)="row">
@@ -99,30 +99,30 @@
 
             <template #cell(fechaEmisionFactura)="row">
               <p class="m-1 text-center rounded" badge="BV">
-                <small>{{ row.item.fechaEmisionFactura }}</small>
+                <small>{{ row.item.fechaEmisionFactura | formatDate}}</small>
               </p>
             </template>
             <template #cell(fechaEnvioOficios)="row">
               <p class="m-1 text-center rounded" badge="BV">
-                <small>{{ row.item.fechaEnvioOficios }}</small>
+                <small>{{ row.item.fechaEnvioOficios | formatDate }}</small>
               </p>
             </template>
 
             <template #cell(fechaMinistracion)="row">
               <p class="m-1 text-center rounded" badge="BV">
-                <small>{{ row.item.fechaMinistracion }}</small>
+                <small>{{ row.item.fechaMinistracion | formatDate }}</small>
               </p>
             </template>
 
             <template #cell(montoMinistrado)="row">
               <p class="m-1 text-center rounded" badge="BV">
-                <small>{{ row.item.montoMinistrado }}</small>
+                <small>{{ row.item.montoMinistrado | toCurrency}}</small>
               </p>
             </template>
 
             <template #cell(fechaNotificacion)="row">
               <p class="m-1 text-center rounded" badge="BV">
-                <small>{{ row.item.fechaNotificacion }}</small>
+                <small>{{ row.item.fechaNotificacion | formatDate }}</small>
               </p>
             </template>
           </b-table>
@@ -132,14 +132,14 @@
             <%_ } _%>
           <%_ }); _%>
         </b-tab>
-        <b-tab title="Seguimiento" >
+        <b-tab title="Seguimiento">
           <%_ entity.properties.forEach(property => { _%>
             <%_ if (property.estatus === 'Seguimiento') { _%>
 <%- include('page-fields', {entity: entity, property: property}); %>
             <%_ } _%>
           <%_ }); _%>
         </b-tab>
-        <b-tab title="Evaluación de resultados" >
+        <b-tab title="Evaluación de resultados">
           <%_ entity.properties.forEach(property => { _%>
             <%_ if (property.estatus === 'Evaluación de resultados') { _%>
 <%- include('page-fields', {entity: entity, property: property}); %>

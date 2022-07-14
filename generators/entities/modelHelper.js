@@ -144,6 +144,7 @@ module.exports = class modelHelper {
     property.etapa = row.etapa;
     property.estatus = row.estatus;
     property.orden = row.orden;
+    property.catalog = row.catalogo;
     property.validations = {};
     property.validations.max = row.max;
     property.validations.catalogo = row.catalogo;
