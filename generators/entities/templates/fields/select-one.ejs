@@ -1,4 +1,8 @@
-          <b-form-group id="form-group-<%= property.dashCase%>-id" label="<%= property.title%>" label-for="input-<%= property.dashCase%>-id">
+          <b-form-group
+            id="form-group-<%= property.dashCase%>-id"
+            label="<%= property.title%>"
+            label-for="input-<%= property.dashCase%>-id"
+          >
             <b-form-select
               v-model="<%= entity.name.camelCase%>.<%= property.camelCase%>"
               :options="<%= property.catalog%>Options"
