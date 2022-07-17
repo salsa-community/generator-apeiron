@@ -6,8 +6,8 @@ module.exports = class EntityProcessor {
     this.doProcessModelJava(model, generator);
     this.doProcessModelDtoJava(model, generator);
     this.doProcessProjectVue(model, generator);
-    // this.doProcessProyectoMapperTs(model, generator);
-    // this.doProcessUtilTs(model, generator);
+    //this.doProcessProyectoMapperTs(model, generator);
+    //this.doProcessUtilTs(model, generator);
   }
 
   static doProcessEntityModelTs(model, generator) {

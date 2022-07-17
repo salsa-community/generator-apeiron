@@ -1,9 +1,10 @@
-const PrivateBase = require('./generator-base-private');
+const PrivateBase = require('./private-base-generator');
 const chalk = require('chalk');
 const packagejs = require('../package.json');
-const GENERATOR_SALSA = 'generator-salsa';
+const GENERATOR_APEIRON = 'generator-apeiron';
 const exec = require('child_process').exec;
 const semver = require('semver');
+
 /**
  * This is the Generator base class.
  * This provides all the public API methods exposed via the module system.
@@ -11,7 +12,7 @@ const semver = require('semver');
  *
  * The method signatures in public API should not be changed without a major version change
  */
-module.exports = class SalsaBaseGenerator extends PrivateBase {
+module.exports = class BaseGenerator extends PrivateBase {
   constructor(args, options, features) {
     super(args, options, features);
   }
@@ -65,9 +66,9 @@ module.exports = class SalsaBaseGenerator extends PrivateBase {
   checkInvocationFromCLI() {
     if (!this.options.fromCli) {
       this.warning(
-        `Deprecated: SALSA seems to be invoked using Yeoman command. Please use the Salsa CLI. Run ${chalk.red(
-          'salsa <command>'
-        )} instead of ${chalk.red('yo salsa:<command>')}`
+        `Deprecated: APEIRON seems to be invoked using Yeoman command. Please use the APEIRON CLI. Run ${chalk.red(
+          'apeiron <command>'
+        )} instead of ${chalk.red('yo apeiron:<command>')}`
       );
     }
   }
@@ -80,7 +81,7 @@ module.exports = class SalsaBaseGenerator extends PrivateBase {
   }
 
   /**
-   * Prints a SALSA logo.
+   * Prints a APEIRON logo.
    */
   printLogo() {
     this.log('\n');
@@ -90,20 +91,20 @@ module.exports = class SalsaBaseGenerator extends PrivateBase {
     this.log(`${chalk.green('╚════██║██╔══██║██║     ╚════██║██╔══██║')}`);
     this.log(`${chalk.green('███████║██║  ██║███████╗███████║██║  ██║')}`);
     this.log(`${chalk.green('╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝')}`);
-    this.log(chalk.white.bold('    https://salsa.crip.conacyt.mx/\n'));
-    this.log(chalk.white('Welcome to ') + chalk.green(`salsa `) + chalk.yellow(`v${packagejs.version}`));
+    this.log(chalk.white.bold('    https://APEIRON.crip.conacyt.mx/\n'));
+    this.log(chalk.white('Welcome to ') + chalk.green(`apeiron `) + chalk.yellow(`v${packagejs.version}`));
     this.log(chalk.white(`Application files will be generated in folder: ${chalk.yellow(process.cwd())}`));
     if (process.cwd() === this.getUserHome()) {
       this.log(chalk.red.bold('\n️⚠️  WARNING ⚠️  You are in your HOME folder!'));
-      this.log(chalk.red('This can cause problems, you should always create a new directory and run the salsa command from here.'));
-      this.log(chalk.white(`See the troubleshooting section at ${chalk.yellow('https://salsa.crip.conacyt.mx/')}`));
+      this.log(chalk.red('This can cause problems, you should always create a new directory and run the APEIRON command from here.'));
+      this.log(chalk.white(`See the troubleshooting section at ${chalk.yellow('https://APEIRON.crip.conacyt.mx/')}`));
     }
     this.log(
       chalk.green(' _______________________________________________________________________________________________________________\n')
     );
-    this.log(chalk.white(`  Documentation for SALSA project ${chalk.yellow('https://salsa.crip.conacyt.mx/')}`));
+    this.log(chalk.white(`  Documentation for APEIRON project ${chalk.yellow('https://APEIRON.crip.conacyt.mx/')}`));
     this.log(
-      chalk.white(`  If you find SALSA useful, consider be part of the project at ${chalk.yellow('https://github.com/salsa-community')}`)
+      chalk.white(`  If you find APIRON useful, consider be part of the project at ${chalk.yellow('https://github.com/APEIRON-community')}`)
     );
     this.log(
       chalk.green(' _______________________________________________________________________________________________________________\n')
@@ -113,19 +114,19 @@ module.exports = class SalsaBaseGenerator extends PrivateBase {
     try {
       const done = this.async();
       shelljs.exec(
-        `npm show ${GENERATOR_SALSA} version --fetch-retries 1 --fetch-retry-mintimeout 500 --fetch-retry-maxtimeout 500`,
+        `npm show ${GENERATOR_APEIRON} version --fetch-retries 1 --fetch-retry-mintimeout 500 --fetch-retry-maxtimeout 500`,
         { silent: true },
         (code, stdout, stderr) => {
           if (!stderr && semver.lt(packagejs.version, stdout)) {
             this.log(
               `${
                 chalk.yellow(' ______________________________________________________________________________\n\n') +
-                chalk.yellow('  SALSA update available: ') +
+                chalk.yellow('  APEIRON update available: ') +
                 chalk.green.bold(stdout.replace('\n', '')) +
                 chalk.gray(` (current: ${packagejs.version})`)
               }\n`
             );
-            this.log(chalk.yellow(`  Run ${chalk.magenta(`npm install -g ${GENERATOR_SALSA}`)} to update.\n`));
+            this.log(chalk.yellow(`  Run ${chalk.magenta(`npm install -g ${GENERATOR_APEIRON}`)} to update.\n`));
             this.log(chalk.yellow(' ______________________________________________________________________________\n'));
           }
           done();
@@ -178,7 +179,7 @@ module.exports = class SalsaBaseGenerator extends PrivateBase {
     }
     if (!(process.release || {}).lts) {
       this.warning(
-        'Your Node version is not LTS (Long Term Support), use it at your own risk! SALSA does not support non-LTS releases, so if you encounter a bug, please use a LTS version first.'
+        'Your Node version is not LTS (Long Term Support), use it at your own risk! APEIRON does not support non-LTS releases, so if you encounter a bug, please use a LTS version first.'
       );
     }
   }

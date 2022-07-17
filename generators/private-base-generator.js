@@ -13,7 +13,7 @@ const packagejs = require('../package.json');
  * These methods should not be directly utilized using commonJS require,
  *
  */
-module.exports = class SalsaBasePrivateGenerator extends Generator {
+module.exports = class PrivateGenerator extends Generator {
   constructor(args, options, features) {
     super(args, options, features);
     // expose lodash to templates
@@ -28,6 +28,6 @@ module.exports = class SalsaBasePrivateGenerator extends Generator {
    * Override yeoman generator's usage function to fine tune --help message.
    */
   usage() {
-    return super.usage().replace('yo salsa:', 'salsa ');
+    return super.usage().replace('yo apeiron:', 'apeiron ');
   }
 };

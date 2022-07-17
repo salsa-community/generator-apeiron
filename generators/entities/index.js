@@ -1,12 +1,11 @@
-var Generator = require('yeoman-generator');
+let PrettyGenerator = require('../pretty-generator');
 
 const ModelHelper = require('./modelHelper');
 const { ONE_TO_MANY } = require('../../util/relationships-types');
 const GeneratorProcessor = require('./processors/generatorProcessor');
-
-module.exports = class extends Generator {
-  constructor(args, opts) {
-    super(args, opts);
+module.exports = class extends PrettyGenerator {
+  constructor(args, opts, features) {
+    super(args, opts, features);
     this.option('prod');
     this.option('qa');
   }
