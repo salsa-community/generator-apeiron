@@ -1,14 +1,9 @@
-          <b-form-group
-            id="form-group-<%= property.dashCase%>-id"
-            label="<%= property.title%>"
-            label-for="input-<%= property.dashCase%>-id"
-          >
+          <b-form-group id="form-group-<%= property.dashCase%>-id" label="<%= property.title%>" label-for="input-<%= property.dashCase%>-id">
             <b-form-input
               id="input-<%= property.dashCase%>-id"
               autocomplete="off"
               :state="<%= entity.name.camelCase%>.<%= property.camelCase%> != null && <%= entity.name.camelCase%>.<%= property.camelCase%>.length > 0"
               v-model="<%= entity.name.camelCase%>.<%= property.camelCase%>"
-              placeholder="<%= property.description%>"
-            >
+              placeholder="<%= property.description%>">
             </b-form-input>
           </b-form-group>

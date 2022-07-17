@@ -6,8 +6,8 @@ module.exports = class EntityProcessor {
     this.doProcessModelJava(model, generator);
     this.doProcessModelDtoJava(model, generator);
     this.doProcessProjectVue(model, generator);
-    //this.doProcessProyectoMapperTs(model, generator);
-    //this.doProcessUtilTs(model, generator);
+    // this.doProcessProyectoMapperTs(model, generator);
+    // this.doProcessUtilTs(model, generator);
   }
 
   static doProcessEntityModelTs(model, generator) {
@@ -63,7 +63,7 @@ module.exports = class EntityProcessor {
 
   static doProcessProyectoMapperTs(model, generator) {
     generator.fs.copyTpl(generator.templatePath('proyecto.mapper.ts.ejs'), generator.destinationPath(`demo/proyecto.mapper.ts`), {
-      entity: model.proyecto,
+      entity: model.entities.proyecto,
     });
   }
 };

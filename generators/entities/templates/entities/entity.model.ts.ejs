@@ -19,11 +19,12 @@ export class <%=entity.name.pascalCase%> implements I<%=entity.name.pascalCase%>
 <% if (!entity.isEmbedded) { -%>
     public id?: string,
 <% } -%>
-    <%_ entity.properties.forEach(property => { _%>
-    public <%= property.camelCase%>?: <%= property.frontEndType%> | null,
-    <%_ }); _%>
-    <%_ for( relationship of entity.relationships.filter(relationship => relationship.type == 'oneToMany' || relationship.type == 'oneToOne')) { -%>
-    public <%= relationship.name.camelCase %>?: I<%=relationship.to.name.pascalCase%>[] | null,
+    <%_ let maxRelationships =  entity.relationships.filter(relationship => relationship.type == 'oneToMany' || relationship.type == 'oneToOne').length -%>
+    <%_ entity.properties.forEach((property, index) => { _%>
+    public <%= property.camelCase%>?: <%= property.frontEndType%> | null<%_ if ((index < entity.properties.length - 1) || maxRelationships > 0) { %>,<% } %>
+    <%_ }); -%>
+    <%_ for( const [index, relationship] of entity.relationships.filter(relationship => relationship.type == 'oneToMany' || relationship.type == 'oneToOne').entries()) { -%>
+    public <%= relationship.name.camelCase %>?: I<%=relationship.to.name.pascalCase%>[] | null<%_ if (index < maxRelationships - 1) { %>,<% } %>
     <%_ } -%>
   ) {
     <%_ for( relationship of entity.relationships.filter(relationship => relationship.type == 'oneToMany' || relationship.type == 'oneToOne')) { -%>
