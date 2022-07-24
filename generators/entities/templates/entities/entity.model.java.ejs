@@ -33,8 +33,11 @@ public class <%=entity.name.pascalCase%> implements Serializable {
 <% } -%>
 <%_ entity.properties.forEach(property => { _%>
   @Field("<%= property.snakeCase%>")
-  private <%= property.backEndType%> <%= property.camelCase%>;
-
+<%_ if (property.multiplicidad === 'many') { _%>
+  private List<<%= property.backEndType%>> <%= property.camelCase %>;
+<%_} else { _%>
+  private <%= property.backEndType%> <%= property.camelCase %>;
+<%_ } _%>
 <%_ }); %>
 <% for( relationship of entity.relationships.filter(relationship => relationship.type == 'oneToMany' || relationship.type == 'oneToOne')) { -%>
   private List<<%= relationship.to.name.pascalCase%>> <%= relationship.name.camelCase%>;
@@ -43,10 +46,17 @@ public class <%=entity.name.pascalCase%> implements Serializable {
   // jhipster-needle-entity-add-field - JHipster will add fields here
 
 <%_ entity.properties.forEach(property => { _%>
+<%_ if (property.multiplicidad === 'many') { _%>
+  public <%= entity.name.pascalCase%> <%= property.camelCase%>(List<<%= property.backEndType%>> <%= property.camelCase%>) {
+    this.set<%= property.pascalCase%>(<%= property.camelCase%>);
+    return this;
+  }
+<%_} else { _%>
   public <%= entity.name.pascalCase%> <%= property.camelCase%>(<%= property.backEndType%> <%= property.camelCase%>) {
     this.set<%= property.pascalCase%>(<%= property.camelCase%>);
     return this;
   }
+<%_ } _%>
 <%_ }); _%>
 
 <% for( relationship of entity.relationships.filter(relationship => relationship.type == 'oneToMany' || relationship.type == 'oneToOne')) { -%>

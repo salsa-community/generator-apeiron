@@ -25,7 +25,11 @@ public class <%=entity.name.pascalCase%>DTO implements Serializable {
   private String id;
 <% } -%>
 <%_ entity.properties.forEach(property => { _%>
+<%_ if (property.multiplicidad === 'many') { _%>
+  private List<<%= property.backEndType%>> <%= property.camelCase %>;
+<%_} else { _%>
   private <%= property.backEndType%> <%= property.camelCase %>;
+<%_ } _%>
 <%_ }); -%>
 <% for( relationship of entity.relationships.filter(relationship => relationship.type == 'oneToMany' || relationship.type == 'oneToOne')) { -%>
   private List<<%= relationship.to.name.pascalCase%>DTO> <%= relationship.name.camelCase%>;

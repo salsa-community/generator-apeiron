@@ -3,7 +3,7 @@
               <b-form-datepicker
                 value-as-date
                 id="input-<%= property.dashCase%>-id"
-                placeholder="<%= property.description%>"
+                placeholder="<%= property.title%>"
                 :state="<%= entity.name.camelCase%>.<%= property.camelCase%> != null"
                 v-model="<%= entity.name.camelCase%>.<%= property.camelCase%>"
                 locale="es">

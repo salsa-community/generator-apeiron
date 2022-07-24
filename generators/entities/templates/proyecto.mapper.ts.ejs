@@ -1,13 +1,26 @@
+
 static toProyecto(p, spinner) {
   let proyecto = {};
   proyecto.id = String.normalizeId(p.cve_convocatoria) + '-' + p.cve_proyecto;
-<%_ entity.properties.forEach(property => { _%>
-<%_ if (property.frontEndType === 'number') { _%>
+<% entity.properties.forEach(property => { _%>
+<%_ if (property.backEndType === 'Double') { _%>
   proyecto.<%= property.camelCase%> = this.resolveDouble(p.<%= property.snakeCase%>);
+<%_ } _%>
+<%_ if (property.backEndType === 'Integer') { _%>
+  proyecto.<%= property.camelCase%> = this.resolveInteger(p.<%= property.snakeCase%>);
 <%_ } _%>
 <%_ if (property.frontEndType === 'string') { _%>
   proyecto.<%= property.camelCase%> = p.<%= property.snakeCase%>;
 <%_ } _%>
+<%_ if (property.frontEndType === 'Date') { _%>
+  proyecto.<%= property.camelCase%> = this.resolveDate(p.<%= property.snakeCase%>);
+<%_ } _%>
+<%_ if (property.frontEndType === 'Boolean') { _%>
+  proyecto.<%= property.camelCase%> = p.<%= property.snakeCase%>;
+<%_ } _%>
 <%_ }); _%>
+<% for( relationship of entity.relationships.filter(relationship => relationship.type == 'oneToMany' || relationship.type == 'oneToOne')) { -%>
+  proyecto.<%= relationship.name.camelCase %> = [];
+<% } -%>
   return proyecto;
 }

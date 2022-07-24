@@ -13,7 +13,6 @@ const prettier = require('gulp-prettier');
 module.exports = class PrettyGenerator extends BaseGenerator {
   constructor(args, options, features) {
     super(args, options, features);
-    prettier;
     this.queueTransformStream(gulpif(file => file.extname == '.java', prettier({ tabWidth: 4 })));
     this.queueTransformStream(gulpif(file => file.extname == '.ts', prettier({ singleQuote: true })));
     this.queueTransformStream(gulpif(file => file.extname == '.vue', prettier({ singleQuote: true })));

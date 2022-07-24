@@ -7,7 +7,7 @@ export interface I<%=entity.name.pascalCase%> {
   id?: string;
 <% } -%>
 <%_ entity.properties.forEach(property => { _%>
-  <%= property.camelCase%>?: <%= property.frontEndType%> | null;
+  <%= property.camelCase%>?: <%= property.frontEndType%><%_ if (property.multiplicidad === 'many') { _%>[]<% } %> | null;
 <%_ }); _%>
 <% for( relationship of entity.relationships.filter(relationship => relationship.type == 'oneToMany' || relationship.type == 'oneToOne')) { -%>
   <%= relationship.name.camelCase %>?: I<%=relationship.to.name.pascalCase%>[] | null;
@@ -21,12 +21,17 @@ export class <%=entity.name.pascalCase%> implements I<%=entity.name.pascalCase%>
 <% } -%>
     <%_ let maxRelationships =  entity.relationships.filter(relationship => relationship.type == 'oneToMany' || relationship.type == 'oneToOne').length -%>
     <%_ entity.properties.forEach((property, index) => { _%>
-    public <%= property.camelCase%>?: <%= property.frontEndType%> | null<%_ if ((index < entity.properties.length - 1) || maxRelationships > 0) { %>,<% } %>
+    public <%= property.camelCase%>?: <%= property.frontEndType%><%_ if (property.multiplicidad === 'many') { _%>[]<% } %> | null<%_ if ((index < entity.properties.length - 1) || maxRelationships > 0) { %>,<% } %>
     <%_ }); -%>
     <%_ for( const [index, relationship] of entity.relationships.filter(relationship => relationship.type == 'oneToMany' || relationship.type == 'oneToOne').entries()) { -%>
     public <%= relationship.name.camelCase %>?: I<%=relationship.to.name.pascalCase%>[] | null<%_ if (index < maxRelationships - 1) { %>,<% } %>
     <%_ } -%>
   ) {
+    <%_ entity.properties.forEach((property, index) => { _%>
+      <%_ if (property.multiplicidad === 'many') { _%>
+      this.<%= property.camelCase%> = this.<%= property.camelCase%> ? this.<%= property.camelCase%> : [];
+      <%_ }; _%>
+      <%_ }); _%>
     <%_ for( relationship of entity.relationships.filter(relationship => relationship.type == 'oneToMany' || relationship.type == 'oneToOne')) { -%>
     this.<%= relationship.name.camelCase%> = this.<%= relationship.name.camelCase%> ? this.<%= relationship.name.camelCase%> : [];
     <%_ } -%>

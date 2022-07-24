@@ -183,6 +183,8 @@ module.exports = class modelHelper {
       return 'Integer';
     } else if (type.toUpperCase() == 'BOOLEAN') {
       return 'Boolean';
+    } else if (type.toUpperCase() == 'DOUBLE') {
+      return 'Double';
     }
     return type;
   }

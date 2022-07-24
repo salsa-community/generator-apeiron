@@ -2,11 +2,11 @@
 
 module.exports = class EntityProcessor {
   static doProcess(model, generator) {
-    this.doProcessEntityModelTs(model, generator);
-    this.doProcessModelJava(model, generator);
-    this.doProcessModelDtoJava(model, generator);
-    this.doProcessProjectVue(model, generator);
-    //this.doProcessProyectoMapperTs(model, generator);
+    //this.doProcessEntityModelTs(model, generator);
+    //this.doProcessModelJava(model, generator);
+    //this.doProcessModelDtoJava(model, generator);
+    //this.doProcessProjectVue(model, generator);
+    this.doProcessProyectoMapperTs(model, generator);
     //this.doProcessUtilTs(model, generator);
   }
 
@@ -62,7 +62,7 @@ module.exports = class EntityProcessor {
   }
 
   static doProcessProyectoMapperTs(model, generator) {
-    generator.fs.copyTpl(generator.templatePath('proyecto.mapper.ts.ejs'), generator.destinationPath(`demo/proyecto.mapper.ts`), {
+    generator.fs.copyTpl(generator.templatePath('proyecto.mapper.ts.ejs'), generator.destinationPath(`demo/proyecto.mapper.js`), {
       entity: model.entities.proyecto,
     });
   }

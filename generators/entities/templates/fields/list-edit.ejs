@@ -1,1 +1,7 @@
-        <list-edit v-model="<%= entity.name.camelCase%>.<%= property.camelCase%>" dataType='<%= property.frontEndType%>'> </list-edit>
+        <list-edit
+        v-model="<%= entity.name.camelCase%>.<%= property.camelCase%>"
+        title="<%= property.title%>"
+        dataType='<%= property.frontEndType%>'
+        placeholder='<%= property.description%>'
+        >
+        </list-edit>
