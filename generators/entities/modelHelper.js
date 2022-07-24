@@ -1,33 +1,15 @@
 'use strict';
 
-const String = require('../util/strings');
-
-const fsreader = require('fs');
-const SECCION_PROP = 'seccion';
-var Generator = require('yeoman-generator');
-const ora = require('ora');
-const chalk = require('chalk');
-const prompts = require('prompts');
-const terminalLink = require('terminal-link');
-const { info, warn } = require('prettycli');
-const cheerio = require('cheerio');
-const $ = cheerio.load('<h2 class="title">Hello world</h2>');
-var beautify = require('gulp-beautify');
-var inquirer = require('inquirer');
-var dateFormat = require('dateformat');
-const BecasService = require('./modelHelper');
+const String = require('../../util/strings');
+const { warn } = require('prettycli');
 const axios = require('axios');
 const fs = require('fs');
 const csv = require('csv-parser');
-const Logger = require('../util/logger');
-const Catalogos = require('../util/distribucion/constants');
 
 const Inflector = require('../inflector');
 
 const moment = require('moment');
-module.exports = class guiService {
-  static log = Logger.getLogger('rules-warning');
-
+module.exports = class modelHelper {
   static toProyecto(p, spinner) {
     let proyecto = {};
     proyecto.id = String.normalizeId(p.convocatoria) + '-' + p.clave;
@@ -58,7 +40,7 @@ module.exports = class guiService {
 
   static split(id, string, spinner, validate, modulo) {
     if (string) {
-      const elements = string; //string.toString().split(',');
+      const elements = string;
       for (let index = 0; index < elements.length; index++) {
         elements[index] = String.normalize(elements[index]);
         if (!validate.includes(elements[index])) {
@@ -96,16 +78,43 @@ module.exports = class guiService {
     } while (currentDate - date < milliseconds);
   }
 
-  static readModelFromCsv(filePath) {
-    let model = {}; //this.createDefaultModel();
+  static addRelationship(model, leftEntity, rightEntity, type, name) {
+    let relationship = { to: model.entities[rightEntity], type: type, name: this.resolveCommonNames(name) };
+    model.entities[leftEntity].relationships.push(relationship);
+  }
+
+  static markAsEmbedded(model, entityName) {
+    model.entities[entityName].isEmbedded = true;
+  }
+
+  static resolveDefaultOutputPaths(model, packageName, generator) {
+    let packageNameWithSlash = packageName.replace(/\./g, '/');
+    model.out = {};
+    model.out.vueEntities = 'src/main/webapp/app/entities/proyectosMs';
+    model.out.entityModelTs = 'src/main/webapp/app/shared/model/proyectosMs';
+    model.out.dtos = 'src/main/webapp/app/shared/model/msPerfil';
+    model.out.modelJava = `src/main/java/${packageNameWithSlash}/domain`;
+    model.out.modelDtoJava = `src/main/java/${packageNameWithSlash}/service/dto`;
+    model.out.apiPath = 'api.yml';
+    this.addPackage(model, packageName);
+  }
+
+  static addPackage(model, packageName) {
+    for (let entityKey in model.entities) {
+      model.entities[entityKey].package = packageName;
+    }
+  }
+
+  static readModelFromCsv(filePath, generator) {
+    let model = { entities: {} };
     return new Promise(resolve => {
       fs.createReadStream(filePath)
-        .pipe(csv({ mapHeaders: ({ header }) => String.toCamelCase(header) }))
+        .pipe(csv({ mapHeaders: ({ header }) => String.normalize(String.toCamelCase(header)) }))
         .on('data', row => {
-          if (!model[row.objeto]) {
-            model[row.objeto] = this.createDefaultModel(row.objeto);
+          if (!model.entities[row.objeto]) {
+            model.entities[row.objeto] = this.createEntity(row.objeto);
           }
-          model[row.objeto].properties.push(this.createProperty(row));
+          model.entities[row.objeto].properties.push(this.createProperty(row));
         })
         .on('end', function () {
           resolve(model);
@@ -113,27 +122,20 @@ module.exports = class guiService {
     });
   }
 
-  static createDefaultModel(entityName) {
+  static createEntity(entityName) {
     return {
       title: String.toPascalCase(entityName),
-      name: {
-        plural: Inflector.pluralize(entityName),
-        camelCase: String.toCamelCase(entityName),
-        dashCase: String.toDashCase(entityName),
-        pascalCase: String.toPascalCase(entityName),
-      },
+      name: this.resolveCommonNames(entityName),
       path: '',
       properties: [],
+      relationships: [],
       type: 'object',
+      isEmbedded: false,
     };
   }
 
   static createProperty(row) {
-    let property = {};
-    property.camelCase = String.toCamelCase(row.nombreCamposPantalla);
-    property.dashCase = String.toDashCase(row.nombreCamposPantalla);
-    property.pascalCase = String.toPascalCase(row.nombreCamposPantalla);
-    property.snakeCase = String.toSnakeCase(row.nombreCamposPantalla);
+    let property = this.resolveCommonNames(row.nombreCamposPantalla);
     property.multiplicidad = this.resolveMultiplicidad(row.multiplicidad);
     property.frontEndType = this.resolveFrontEndType(row.tipo);
     property.backEndType = this.resolveBackEndType(row.tipo);
@@ -142,14 +144,30 @@ module.exports = class guiService {
     property.etapa = row.etapa;
     property.estatus = row.estatus;
     property.orden = row.orden;
+    property.catalog = row.catalogo;
+    property.validations = {};
+    property.validations.max = row.max;
+    property.validations.catalogo = row.catalogo;
+    property.validations.regexp = row.regExp;
     return property;
   }
 
+  static resolveCommonNames(name) {
+    return {
+      plural: Inflector.pluralize(name),
+      camelCase: String.toCamelCase(name),
+      dashCase: String.toDashCase(name),
+      pascalCase: String.toPascalCase(name),
+      snakeCase: String.toSnakeCase(name),
+    };
+  }
+
   static resolveFrontEndType(type) {
-    if (type == 'Date') {
+    if (type.toUpperCase() == 'DATE') {
       return 'Date';
     }
-    if (type == 'Double') {
+    // TODO review if Double and Integer are the dame for number in front end
+    if (type.toUpperCase() == 'DOUBLE' || type.toUpperCase() == 'INTEGER') {
       return 'number';
     }
 
@@ -157,8 +175,16 @@ module.exports = class guiService {
   }
 
   static resolveBackEndType(type) {
-    if (type == 'Date') {
+    if (type.toUpperCase() == 'DATE') {
       return 'Instant';
+    } else if (type.toUpperCase() == 'STRING') {
+      return 'String';
+    } else if (type.toUpperCase() == 'INTEGER') {
+      return 'Integer';
+    } else if (type.toUpperCase() == 'BOOLEAN') {
+      return 'Boolean';
+    } else if (type.toUpperCase() == 'DOUBLE') {
+      return 'Double';
     }
     return type;
   }

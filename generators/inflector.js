@@ -8,6 +8,13 @@ DefaultInflector.inflections('es', function (inflect) {
 });
 
 module.exports = class Inflector {
+  static pluralize(word) {
+    this.pluralize(word, 'es');
+  }
+
+  static singularize(word) {
+    this.singularize(word, 'es');
+  }
   static pluralize(word, locate) {
     return DefaultInflector.pluralize(word, locate);
   }

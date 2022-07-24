@@ -1,0 +1,21 @@
+private toCurrentProyecto(temp) {
+  this.currentProyecto.id = temp.id;
+  <%_ entity.properties.forEach(property => { _%>
+  this.currentProyecto.<%= property.camelCase%> = temp.<%= property.camelCase%>;
+  <%_ }); _%>
+  <% for( relationship of entity.relationships.filter(relationship => relationship.type == 'oneToMany' || relationship.type == 'oneToOne')) { -%>
+  this.currentProyecto.<%= relationship.name.camelCase %> = temp.<%= relationship.name.camelCase %> ? temp.<%= relationship.name.camelCase %>: [];
+  <% } -%>
+
+}
+
+private toTempProyecto(proyecto) {
+  this.tempProyecto = new Proyecto();
+  this.tempProyecto.id = proyecto.id;
+  <%_ entity.properties.forEach(property => { _%>
+  this.tempProyecto.<%= property.camelCase%> = proyecto.<%= property.camelCase%>;
+  <%_ }); _%>
+<% for( relationship of entity.relationships.filter(relationship => relationship.type == 'oneToMany' || relationship.type == 'oneToOne')) { -%>
+  this.tempProyecto.<%= relationship.name.camelCase %> = proyecto.<%= relationship.name.camelCase %> ? proyecto.<%= relationship.name.camelCase %>: [];
+<% } -%>
+}
