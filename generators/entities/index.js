@@ -8,6 +8,7 @@ module.exports = class extends PrettyGenerator {
     super(args, opts, features);
     this.option('prod');
     this.option('qa');
+    this.option('dev');
   }
 
   async writing() {
